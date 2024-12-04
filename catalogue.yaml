@@ -37,12 +37,12 @@
       chdir: /app  
 
 
-  - name: copying a service file
+  - name: copying catalogue service file
     ansible.builtin.copy:
       src: catalogue.service
       dest: /etc/systemd/system/catalogue.service
 
-  - name: Just force systemd to reread configs (2.4 and above)
+  - name: daemon reload
     ansible.builtin.systemd_service:
       daemon_reload: true    
 
@@ -51,13 +51,13 @@
       src: mongodb.repo
       dest: /etc/yum.repos.d/mongodb.repo   
 
-  - name: Install nodejs
+  - name: Install mongodb client
     ansible.builtin.dnf:
       name: mongodb-org-shell 
       state: present    
 
   - name: load schema
-    ansible.builtin.shell: mongo --host 172.31.43.114 </app/schema/catalogue.js
+    ansible.builtin.shell: mongo --host 172.31.43.114 < /app/schema/catalogue.js
 
   - name: Start & Enable catalogue Service
     ansible.builtin.service:
