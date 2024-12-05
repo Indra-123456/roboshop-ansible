@@ -37,13 +37,12 @@
   - name: install dependencies
     ansible.builtin.command: mvn clean package
     args:
-      chdir: /app 
+      chdir: /app
 
   - name: rename jar file
     ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar
     args:
-      chdir: /app       
-
+      chdir: /app
 
   - name: copy shipping service
     ansible.builtin.copy:
@@ -57,19 +56,22 @@
   - name: install mysql client
     ansible.builtin.dnf:
       name: mysql
-      state: present    
+      state: present
 
-  - name: check cities schema exist or not
-    ansible.builtin.command: mysql -h 172.31.35.95 -uroot -p{{mysql_password}} -sN -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'cities'"   
+  - name: check cities schema exists or not
+    ansible.builtin.command:  mysql -h mysql.daws76s.online -uroot -p{{mysql_password}} -sN -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'cities'"
     register: schema
 
-  - name: printing schema
+  - name: print output
     ansible.builtin.debug:
-      msg: "printing schema: {{schema}}" 
+      msg: "schema output: {{schema}}"
 
   - name: load cities data
-    ansible.builtin.shell: "mysql -h 172.31.35.95 -uroot -p{{mysql_password}} < /app/schema/shipping.sql"
+    ansible.builtin.shell: "mysql -h 172.31.35.95 -uroot -p{{mysql_password}}  < /app/schema/shipping.sql"
     when: schema.stdout != "1"
 
-
-      
+  - name: start and enable shipping
+    ansible.builtin.service:
+      name: shipping
+      state: restarted
+      enabled: yes
