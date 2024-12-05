@@ -65,4 +65,11 @@
 
   - name: printing schema
     ansible.builtin.debug:
-      msg: "printing schema: {{schema}}"  
+      msg: "printing schema: {{schema}}" 
+
+  - name: load cities data
+    ansible.builtin.command: mysql -h 172.31.35.95 -uroot -p{{mysql_password}} < /app/schema/shipping.sql 
+    when: schema.stdout != "1"
+
+
+      
